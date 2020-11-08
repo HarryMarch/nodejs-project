@@ -105,4 +105,16 @@ describe('BrandsService', () => {
       expect(repository.delete).toHaveBeenCalledWith(id);
     });
   });
+
+  describe('getAllProductsByBrandName', () => {
+    it('get all products that have brand name like value', async () => {
+      const value = 'brand';
+      repository.find.mockReturnValue([new Brand(), new Brand()]);
+
+      expect(repository.find).not.toHaveBeenCalled();
+      const dtos = await service.getAllProductsByBrandName(value);
+      expect(dtos).toBeInstanceOf(Array);
+      expect(repository.find).toHaveBeenCalled();
+    });
+  });
 });

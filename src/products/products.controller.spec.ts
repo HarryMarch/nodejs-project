@@ -3,6 +3,10 @@ import { plainToClass } from 'class-transformer';
 import { BrandRepository } from '../brands/brand.repository';
 import { BrandsService } from '../brands/brands.service';
 import { CreateProductDto } from './dto/create-product.dto';
+import {
+  ProductsFilterCriteria,
+  ProductsFilterDto,
+} from './dto/products-filter.dto';
 import { RetrieveProductDto } from './dto/retrieve-product.dto';
 import { ProductStatus } from './product-status.enum';
 import { Product } from './product.entity';
@@ -13,6 +17,7 @@ import { ProductsService } from './products.service';
 describe('ProductsController', () => {
   let controller: ProductsController;
   let service: ProductsService;
+  let brandsService: BrandsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -27,6 +32,7 @@ describe('ProductsController', () => {
 
     controller = module.get<ProductsController>(ProductsController);
     service = module.get<ProductsService>(ProductsService);
+    brandsService = module.get<BrandsService>(BrandsService);
   });
 
   afterEach(() => {
@@ -36,6 +42,7 @@ describe('ProductsController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
     expect(service).toBeDefined();
+    expect(brandsService).toBeDefined();
   });
 
   describe('Get all products', () => {
@@ -100,6 +107,43 @@ describe('ProductsController', () => {
       const newEntity = await controller.createProduct(createProductDto);
       expect(newEntity).toMatchObject(retrieveProductDto);
       expect(service.createProduct).toHaveBeenCalledWith(createProductDto);
+    });
+  });
+
+  describe('Search products', () => {
+    it('should return an array of products entity when criterion is `NAME`', async () => {
+      // prepare entity
+      const products = [new Product()];
+      const dtoArray = products.map((p) => plainToClass(RetrieveProductDto, p));
+      const pattern = new ProductsFilterDto();
+      pattern.criterion = ProductsFilterCriteria.NAME;
+      pattern.value = 'product';
+
+      jest
+        .spyOn(service, 'getAllProductsByPropertyValue')
+        .mockResolvedValue(products);
+      await expect(controller.searchProducts(pattern)).resolves.toEqual(
+        dtoArray,
+      );
+      expect(service.getAllProductsByPropertyValue).toHaveBeenCalled();
+    });
+
+    it('should return an array of products entity when criterion is `BRAND`', async () => {
+      // prepare entity
+      const products = [new Product()];
+      const dtoArray = products.map((p) => plainToClass(RetrieveProductDto, p));
+      const pattern = new ProductsFilterDto();
+      const value = 'brand';
+      pattern.criterion = ProductsFilterCriteria.BRAND;
+      pattern.value = value;
+
+      jest
+        .spyOn(brandsService, 'getAllProductsByBrandName')
+        .mockResolvedValue(dtoArray);
+      await expect(controller.searchProducts(pattern)).resolves.toEqual(
+        dtoArray,
+      );
+      expect(brandsService.getAllProductsByBrandName).toHaveBeenCalled();
     });
   });
 });

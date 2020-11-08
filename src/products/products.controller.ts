@@ -20,7 +20,10 @@ import {
 import { plainToClass } from 'class-transformer';
 import { BrandsService } from '../brands/brands.service';
 import { CreateProductDto } from './dto/create-product.dto';
-import { ProductsFilterDto } from './dto/products-filter.dto';
+import {
+  ProductsFilterCriteria,
+  ProductsFilterDto,
+} from './dto/products-filter.dto';
 import { RetrieveProductDto } from './dto/retrieve-product.dto';
 import { BrandIdValidationPipe } from './pipes/brandId-validation.pipe';
 import { ProductsFilterValidationPipe } from './pipes/products-filter-validation.pipe';
@@ -45,6 +48,34 @@ export class ProductsController {
   })
   async getAllProducts(): Promise<RetrieveProductDto[]> {
     const products = await this.productsService.getAllProducts();
+    return products.map((product) => plainToClass(RetrieveProductDto, product));
+  }
+
+  @Get('/search')
+  @ApiOperation({ summary: 'Search products' })
+  @ApiOkResponse({
+    description: 'Successful Request',
+    type: [RetrieveProductDto],
+  })
+  @ApiBadRequestResponse({
+    description: 'Validation failed',
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error',
+  })
+  async searchProducts(
+    @Query(new ProductsFilterValidationPipe()) pattern: ProductsFilterDto,
+  ): Promise<RetrieveProductDto[]> {
+    const { criterion, value } = pattern;
+
+    if (criterion === ProductsFilterCriteria.BRAND) {
+      return await this.brandsService.getAllProductsByBrandName(value);
+    }
+
+    const products = await this.productsService.getAllProductsByPropertyValue(
+      pattern,
+    );
+
     return products.map((product) => plainToClass(RetrieveProductDto, product));
   }
 
@@ -106,12 +137,5 @@ export class ProductsController {
   ): Promise<RetrieveProductDto> {
     const entity = await this.productsService.createProduct(product);
     return plainToClass(RetrieveProductDto, entity);
-  }
-
-  @Get('/search')
-  searchProducts(
-    @Query(new ProductsFilterValidationPipe()) pattern: ProductsFilterDto,
-  ) {
-    return {};
   }
 }

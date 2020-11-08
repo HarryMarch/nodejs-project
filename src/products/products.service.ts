@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Like } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
+import { ProductsFilterDto } from './dto/products-filter.dto';
 import { Product } from './product.entity';
 import { ProductRepository } from './product.repository';
 
@@ -75,5 +77,27 @@ export class ProductsService {
     const savedEntity = await this.productRepository.save(entity);
 
     return savedEntity.toJSON();
+  }
+
+  /**
+   * Search Products with proper column has value like search string
+   *
+   * @param {ProductsFilterDto} pattern
+   * @return {*}  {Promise<Product[]>} an array of Products
+   * @memberof ProductsService
+   */
+  async getAllProductsByPropertyValue(
+    pattern: ProductsFilterDto,
+  ): Promise<Product[]> {
+    const { criterion, value } = pattern;
+    const condition = {};
+    condition[criterion] = Like(`%${value}%`);
+
+    const products = await this.productRepository.find({
+      relations: ['brand'],
+      where: condition,
+    });
+
+    return products;
   }
 }

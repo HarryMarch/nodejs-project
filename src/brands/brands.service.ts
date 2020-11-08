@@ -1,5 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { classToClass, plainToClass } from 'class-transformer';
+import { RetrieveProductDto } from '../products/dto/retrieve-product.dto';
+import { Like } from 'typeorm';
 import { Brand } from './brand.entity';
 import { BrandRepository } from './brand.repository';
 import { CreateBrandDto } from './dto/create-brand.dto';
@@ -74,5 +77,37 @@ export class BrandsService {
     }
 
     return true;
+  }
+
+  /**
+   * Get all products that have brand name like value
+   *
+   * @param {string} search string to query `name` column
+   * @return {*}  {Promise<RetrieveProductDto[]>}
+   * @memberof BrandsService
+   */
+  async getAllProductsByBrandName(
+    search: string,
+  ): Promise<RetrieveProductDto[]> {
+    const brands = await this.brandRepository.find({
+      relations: ['products'],
+      where: {
+        name: Like(`%${search}%`),
+      },
+    });
+
+    const productsArray: RetrieveProductDto[] = [];
+    brands.map((brand) => {
+      const { products } = brand;
+      if (products?.length) {
+        products.map((product) => {
+          product.brand = classToClass(brand);
+          const dto = plainToClass(RetrieveProductDto, product);
+          productsArray.push(dto);
+        });
+      }
+    });
+
+    return productsArray;
   }
 }

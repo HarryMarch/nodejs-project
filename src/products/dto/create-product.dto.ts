@@ -6,7 +6,7 @@ import {
   IsString,
   IsNumber,
 } from 'class-validator';
-import { Brand } from 'src/brands/brand.entity';
+import { Brand } from '../../brands/brand.entity';
 import { ProductStatus } from '../product-status.enum';
 
 export class CreateProductDto {

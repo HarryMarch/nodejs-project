@@ -7,6 +7,10 @@ import { ProductsService } from './products.service';
 import { NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductStatus } from './product-status.enum';
+import {
+  ProductsFilterCriteria,
+  ProductsFilterDto,
+} from './dto/products-filter.dto';
 
 /**
  * Make the repository dependency injection available by using mocking instance
@@ -116,6 +120,20 @@ describe('ProductsService', () => {
         service.createProduct(createProductDto),
       ).resolves.not.toBeNull();
       expect(repository.save).toHaveBeenCalledWith(createProductDto);
+    });
+  });
+
+  describe('getAllProductsByPropertyValue', () => {
+    it('search products by specific property', async () => {
+      repository.find.mockReturnValue([new Product(), new Product()]);
+      const pattern = new ProductsFilterDto();
+      pattern.criterion = ProductsFilterCriteria.NAME;
+      pattern.value = 'product';
+
+      expect(repository.find).not.toHaveBeenCalled();
+      const products = await service.getAllProductsByPropertyValue(pattern);
+      expect(products).toBeInstanceOf(Array);
+      expect(repository.find).toHaveBeenCalled();
     });
   });
 });
