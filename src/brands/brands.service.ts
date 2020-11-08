@@ -17,6 +17,12 @@ export class BrandsService {
     private brandRepository: BrandRepository,
   ) {}
 
+  /**
+   * Retrieve all Brands from DB
+   *
+   * @return {*}  {Promise<Brand[]>} an array of Brands
+   * @memberof BrandsService
+   */
   async getAllBrands(): Promise<Brand[]> {
     const brands = await this.brandRepository.find();
     return brands.map((brand) => brand.toJSON());

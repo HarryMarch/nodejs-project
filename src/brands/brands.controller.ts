@@ -27,7 +27,7 @@ import { CreateBrandDto } from './dto/create-brand.dto';
 @ApiTags('brands')
 @Controller('brands')
 export class BrandsController {
-  constructor(private brandService: BrandsService) {}
+  constructor(private brandsService: BrandsService) {}
 
   @Get('/:id')
   @ApiOperation({ summary: 'Get brand' })
@@ -46,7 +46,7 @@ export class BrandsController {
   })
   @UseInterceptors(ClassSerializerInterceptor)
   getBrandById(@Param('id', ParseIntPipe) id: number): Promise<Brand> {
-    return this.brandService.getBrandById(id);
+    return this.brandsService.getBrandById(id);
   }
 
   @Post()
@@ -64,7 +64,7 @@ export class BrandsController {
   })
   @UseInterceptors(ClassSerializerInterceptor)
   createBrand(@Body() brand: CreateBrandDto): Promise<Brand> {
-    return this.brandService.createBrand(brand);
+    return this.brandsService.createBrand(brand);
   }
 
   @Get()
@@ -77,7 +77,7 @@ export class BrandsController {
     description: 'Internal server error',
   })
   getAllBrands(): Promise<Brand[]> {
-    return this.brandService.getAllBrands();
+    return this.brandsService.getAllBrands();
   }
 
   @Delete('/:id')
@@ -96,6 +96,6 @@ export class BrandsController {
     description: 'Internal server error',
   })
   deleteBrand(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
-    return this.brandService.deleteBrandById(id);
+    return this.brandsService.deleteBrandById(id);
   }
 }

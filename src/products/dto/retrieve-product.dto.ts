@@ -1,37 +1,44 @@
-import { Brand } from '../brands/brand.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { ProductStatus } from './product-status.enum';
-import { BaseDBEntity } from '../common/base.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude, Expose, Transform, Type } from 'class-transformer';
+import { Brand } from '../../brands/brand.entity';
+import { ProductStatus } from '../product-status.enum';
 
-@Entity()
-export class Product extends BaseDBEntity<Product> {
+@Exclude()
+export class RetrieveProductDto {
+  @Expose()
   @ApiProperty({ example: 1, description: 'The id of the Product' })
-  @PrimaryGeneratedColumn()
   id: number;
 
+  @Expose()
   @ApiProperty({
-    example: 'Our Product',
+    example: 'New Product',
     description: 'The name of the Product',
   })
-  @Column()
   name: string;
 
+  @Expose()
   @ApiProperty({
     enum: ['AVAILABLE', 'NOT_ACTIVE', 'EXPIRED'],
     description: 'The status of the Product',
   })
-  @Column()
   status: ProductStatus;
 
+  @Expose()
   @ApiProperty({ example: 1000, description: 'The price of the Product' })
-  @Column()
   price: number;
 
+  @Expose()
   @ApiProperty({ example: 'red', description: 'The color of the Product' })
-  @Column()
   color: string;
 
-  @ManyToOne(() => Brand, (brand) => brand.products, { onDelete: 'CASCADE' })
-  brand: Brand;
+  @ApiProperty({
+    example: 1,
+    description: 'The brand of the Product',
+  })
+  brandId: number;
+
+  @Expose()
+  @Type(() => Brand)
+  @Transform((brand) => brand?.name || 'no brand', { toClassOnly: true })
+  brand: string;
 }
