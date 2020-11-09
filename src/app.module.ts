@@ -11,7 +11,6 @@ import { BrandsModule } from './brands/brands.module';
 /*
  *
  * 3, logging
- * 5, github action
  * 6, migration and seed
  * 7,
  */
