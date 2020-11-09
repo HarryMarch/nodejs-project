@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { plainToClass } from 'class-transformer';
-import { BrandRepository } from '../brands/brand.repository';
 import { BrandsService } from '../brands/brands.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import {
@@ -10,9 +9,11 @@ import {
 import { RetrieveProductDto } from './dto/retrieve-product.dto';
 import { ProductStatus } from './product-status.enum';
 import { Product } from './product.entity';
-import { ProductRepository } from './product.repository';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
+import { ProducerService } from '../producer/producer.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Brand } from '../brands/brand.entity';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -24,9 +25,19 @@ describe('ProductsController', () => {
       controllers: [ProductsController],
       providers: [
         ProductsService,
-        ProductRepository,
+        {
+          provide: getRepositoryToken(Product),
+          useValue: {},
+        },
         BrandsService,
-        BrandRepository,
+        {
+          provide: getRepositoryToken(Brand),
+          useValue: {},
+        },
+        {
+          provide: ProducerService,
+          useValue: {},
+        },
       ],
     }).compile();
 

@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -18,6 +19,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
+import { RequestInterceptor } from '../interceptors/request.interceptor';
 import { BrandsService } from '../brands/brands.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import {
@@ -31,6 +33,7 @@ import { ProductsService } from './products.service';
 
 @ApiTags('products')
 @Controller('products')
+@UseInterceptors(RequestInterceptor)
 export class ProductsController {
   constructor(
     private productsService: ProductsService,

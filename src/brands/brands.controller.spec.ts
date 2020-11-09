@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { ProducerService } from '../producer/producer.service';
 import { Brand } from './brand.entity';
-import { BrandRepository } from './brand.repository';
 import { BrandsController } from './brands.controller';
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
@@ -12,7 +13,18 @@ describe('BrandsController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BrandsController],
-      providers: [BrandsService, BrandRepository],
+      providers: [
+        BrandsService,
+        ProducerService,
+        {
+          provide: getRepositoryToken(Brand),
+          useValue: {},
+        },
+        {
+          provide: ProducerService,
+          useValue: {},
+        },
+      ],
     }).compile();
 
     controller = module.get<BrandsController>(BrandsController);

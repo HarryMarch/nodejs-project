@@ -20,12 +20,14 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { RequestInterceptor } from '../interceptors/request.interceptor';
 import { Brand } from './brand.entity';
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 
 @ApiTags('brands')
 @Controller('brands')
+@UseInterceptors(RequestInterceptor)
 export class BrandsController {
   constructor(private brandsService: BrandsService) {}
 
