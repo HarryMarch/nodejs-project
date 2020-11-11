@@ -3,6 +3,13 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 
+/** 
+ * CAUTION: IF YOU RUN E2E TESTING OUTSIDE CONTAINER ENVIRONMENT, YOU NEED TO EXPOSE ALL NEEDED PORTS TO LOCAL,
+ * AND USE `localhost` AS HOST NAME OF ALL CONTAINER SERVICES. IF NOT, EVERY TEST CASES WILL FAIL DUE TO DNS SERVER ERROR.
+ * 
+ * Sincerely,
+ * Harry
+ */
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
@@ -18,7 +25,20 @@ describe('AppController (e2e)', () => {
   it('/ (GET)', () => {
     return request(app.getHttpServer())
       .get('/')
-      .expect(200)
-      .expect('Hello World!');
+      .expect(404)
+      .expect('Not Found');
+  });
+
+  it('/brands/one (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/')
+      .expect(400)
+      .expect('Bad Request');
+  });
+
+  it('/products (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/')
+      .expect(200);
   });
 });

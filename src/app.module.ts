@@ -24,10 +24,4 @@ import { EsModule } from './es/es.module';
     EsModule,
   ],
 })
-// TODO:
-/*
- *
- * 6, migration and seed
- * 7,
- */
 export class AppModule {}
